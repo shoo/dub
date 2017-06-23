@@ -133,7 +133,7 @@ void writeJsonFile(Path path, Json json)
 void atomicWriteJsonFile(Path path, Json json)
 {
 	import std.random : uniform;
-	auto tmppath = path[0 .. $-1] ~ format("%s.%s.tmp", path.head, uniform(0, int.max));
+	auto tmppath = path.parentPath ~ format("%s.%s.tmp", path.head, uniform(0, int.max));
 	auto f = openFile(tmppath, FileMode.createTrunc);
 	scope (failure) {
 		f.close();

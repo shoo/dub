@@ -206,7 +206,7 @@ class VisualDGenerator : ProjectGenerator {
 			Path lastFolder;
 			foreach(source; sortedSources(sourceFiles.values)) {
 				logDebug("source looking at %s", source.structurePath);
-				auto cur = source.structurePath[0 .. source.structurePath.length-1];
+				auto cur = source.structurePath.parentPath;
 				if(lastFolder != cur) {
 					size_t same = 0;
 					foreach(idx; 0..min(lastFolder.length, cur.length))
@@ -511,7 +511,7 @@ private Path determineStructurePath(Path file_path, in ProjectGenerator.TargetIn
 {
 	foreach (p; target.packages) {
 		if (file_path.startsWith(p.path))
-			return Path(getPackageFileName(p.name)) ~ file_path[p.path.length .. $];
+			return Path(getPackageFileName(p.name)) ~ file_path.relativeTo(p.path);
 	}
 	return Path("misc/") ~ file_path.head;
 }
