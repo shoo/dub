@@ -98,6 +98,7 @@ class Dub {
 		Project m_project;
 		Path m_overrideSearchPath;
 		string m_defaultCompiler;
+		string m_defaultArch;
 	}
 
 	/** The default placement location of fetched packages.
@@ -197,6 +198,7 @@ class Dub {
 		m_config = new DubConfig(jsonFromFile(m_dirs.userSettings ~ "settings.json", true), m_config);
 
 		determineDefaultCompiler();
+		determineDefaultArchitecture();
 	}
 
 	@property void dryRun(bool v) { m_dryRun = v; }
@@ -233,6 +235,9 @@ class Dub {
 		will be used.
 	*/
 	@property string defaultCompiler() const { return m_defaultCompiler; }
+	
+	/** Returns the default architecture */
+	@property string defaultArch() const { return m_defaultArch; }
 
 	/** Loads the package that resides within the configured `rootPath`.
 	*/
@@ -1174,6 +1179,16 @@ class Dub {
 		m_defaultCompiler = res.empty ? compilers[0] : res.front;
 	}
 
+	private void determineDefaultArchitecture()
+	{
+		import std.process : environment;
+
+		m_defaultArch = m_config.defaultArch;
+		if (m_defaultArch.length) return;
+
+		m_defaultArch = null;
+	}
+
 	private Path makeAbsolute(Path p) const { return p.absolute ? p : m_rootPath ~ p; }
 	private Path makeAbsolute(string p) const { return makeAbsolute(Path(p)); }
 }
@@ -1496,6 +1511,14 @@ private class DubConfig {
 		if (auto pv = "defaultCompiler" in m_data)
 			return pv.get!string;
 		if (m_parentConfig) return m_parentConfig.defaultCompiler;
+		return null;
+	}
+
+	@property string defaultArch()
+	const {
+		if (auto pv = "defaultArch" in m_data)
+			return pv.get!string;
+		if (m_parentConfig) return m_parentConfig.defaultArch;
 		return null;
 	}
 }
